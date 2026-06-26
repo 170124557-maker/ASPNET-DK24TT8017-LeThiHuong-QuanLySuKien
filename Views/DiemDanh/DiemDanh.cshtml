@@ -1,0 +1,18 @@
+﻿
+    @model DA09_QLSK.Models.SuKien
+
+    @{
+        ViewData["Title"] = "Điểm danh";
+    }
+
+    <div class="container text-center my-5">
+        <div class="card shadow p-4 mx-auto" style="max-width: 400px;">
+            <h4>@Model.TenSK</h4>
+            <p>Vui lòng quét mã QR để xác nhận điểm danh</p>
+
+            <img src="@Url.Action("TaoQRCode", "DiemDanh", new { maSK = Model.MaSK })" class="img-fluid" />
+
+            <a href="@Url.Action("ChiTietSK", "Home", new { id = Model.MaSK })" class="btn btn-secondary mt-3">Quay lại</a>
+        </div>
+    </div>
+ 

@@ -1,0 +1,335 @@
+﻿@*
+    @model IEnumerable<DA09_QLSK.Models.Notification>
+
+
+    <div class="card mb-4 mt-3">
+        <div class="card-header"><strong>Thêm thông báo về sự kiện</strong></div>
+        <div class="card-body">
+            <form asp-action="ThemThongBao" method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Tên sự kiện</label>
+                        <select name="maSK" class="form-control" required>
+                            <option value="">-- Chọn sự kiện --</option>
+                            @if (ViewBag.SuKienList != null)
+                            {
+                                @foreach (var sk in ViewBag.SuKienList)
+                                {
+                                    <option value="@sk.MaSK">@sk.TenSK</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label>Tiêu đề thông báo</label>
+                        <input type="text" name="title" class="form-control" required />
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label>Nội dung</label>
+                    <textarea name="content" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label>Ngày gửi dự kiến</label>
+                        <input type="date" name="scheduledDate" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Giờ gửi dự kiến</label>
+                        <input type="time" name="scheduledTime" class="form-control" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Thêm thông báo</button>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+    </table>
+
+    <div class="container-fluid mt-4">
+        <h2>Danh sách thông báo</h2>
+
+        <a href="/Admin/ThemThongBao" class="btn btn-primary mb-3">
+            <i class="fas fa-plus"></i> Thêm thông báo
+        </a>
+
+
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>}
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>}
+
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tiêu đề Email</th>
+                    <th>Tên sự kiện</th>
+                    <th>Nội dung</th>
+                    <th>Dự kiến gửi</th>
+                    <th>Đã gửi</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(i++)</td>
+                        <td>@item.title</td>
+                        <td>@(item.SuKien != null ? item.SuKien.TenSK : "N/A")</td>
+                        <td title="@item.content">
+                            @{
+                                string content = item.content ?? "";
+                                if (content.Length > 150)
+                                {
+                                    @content.Substring(0, 150)<span>...</span>
+                                }
+                                else
+                                {
+                                    @content
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (item.ScheduledDate.HasValue)
+                            {
+                                <span>@item.ScheduledDate.Value.ToString("dd/MM/yyyy")</span>
+                                @if (item.ScheduledTime.HasValue)
+                                {
+                                    <span>@item.ScheduledTime.Value.ToString(@"hh\:mm")</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa đặt lịch</span> <br />
+                                <button type="button" class="btn btn-sm btn-primary btn-datlich"
+                                        data-id="@item.notification_id"
+                                        data-mask="@item.MaSK"
+                                        data-title="@item.title"
+                                        data-content="@item.content">
+                                    Đặt Lịch
+                                </button>
+                            }
+                        </td>
+                        <td>@(item.sent_at.HasValue ? item.sent_at.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa gửi")</td>
+                        <td>
+                            <form asp-controller="ThongBao" asp-action="GuiThongBaoTuDong" method="post" style="display:inline;">
+                                <input type="hidden" name="notification_id" value="@item.notification_id" />
+
+                                <button type="submit" class="btn btn-info btn-sm" onclick="return confirm('Bạn có chắc muốn gửi?')">Gửi</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.querySelectorAll('.btn-datlich').forEach(btn => {
+            btn.addEventListener('click', function () {
+                // Đổ dữ liệu vào form
+                document.getElementById('form_id').value = this.getAttribute('data-id');
+                document.getElementById('form_maSK').value = this.getAttribute('data-mask');
+                document.getElementById('form_title').value = this.getAttribute('data-title');
+                document.getElementById('form_content').value = this.getAttribute('data-content');
+
+                // Đổi tiêu đề nút
+                document.getElementById('btnSubmit').innerText = "Cập nhật lịch gửi";
+                document.getElementById('btnSubmit').className = "btn btn-warning mt-3";
+                document.getElementById('btnHuy').style.display = "inline-block"
+
+                // Cuộn lên đầu trang
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script> *@
+
+@model IEnumerable<DA09_QLSK.Models.Notification>
+
+
+@{
+    ViewData["Title"] = "Thông báo";
+
+    // Breadcrumb: Thiết lập đường dẫn điều hướng
+
+    ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+        ("Thông báo", null)
+    };
+
+    // Tính toán STT tự động theo trang
+    int currentPage = (int)(ViewBag.Page ?? 1);
+    int stt = (currentPage - 1) * 1 + 1;
+}
+
+<div class="container mt-4">
+    <partial name="_Breadcrumb" /> 
+</div>
+
+
+    <div class="card mb-4 mt-3">
+        <div class="card-header"><strong>Thêm/Cập nhật thông báo sự kiện</strong></div>
+        <div class="card-body">
+            <form asp-action="ThemThongBao" method="post" id="formThongBao">
+                <input type="hidden" name="notification_id" id="form_id" />
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Tên sự kiện</label>
+                        <select name="maSK" id="form_maSK" class="form-control" required>
+                            <option value="">-- Chọn sự kiện --</option>
+                            @if (ViewBag.SuKienList != null)
+                            {
+                                @foreach (var sk in ViewBag.SuKienList)
+                                {
+                                    <option value="@sk.MaSK">@sk.TenSK</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label>Tiêu đề thông báo</label>
+                        <input type="text" name="title" id="form_title" class="form-control" required />
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label>Nội dung</label>
+                    <textarea name="content" id="form_content" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label>Ngày gửi dự kiến</label>
+                        <input type="date" name="scheduledDate" id="form_date" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Giờ gửi dự kiến</label>
+                        <input type="time" name="scheduledTime" id="form_time" class="form-control" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3" id="btnSubmit">Thêm thông báo</button>
+                <!-- Nút Hủy sửa, mặc định bị ẩn -->
+                <button type="button" class="btn btn-secondary mt-3" id="btnHuy" style="display: none;" onclick="location.reload()">Hủy sửa</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+        <h2>Danh sách thông báo</h2>
+
+        @if (TempData["SuccessMessage"] != null)
+        {<div class="alert alert-success">@TempData["SuccessMessage"]</div>}
+        @if (TempData["ErrorMessage"] != null)
+        {<div class="alert alert-danger">@TempData["ErrorMessage"]</div>}
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tiêu đề Email</th>
+                    <th>Tên sự kiện</th>
+                    <th>Nội dung</th>
+                    <th>Dự kiến gửi</th>
+                    <th>Đã gửi</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(i++)</td>
+                        <td>@item.title</td>
+                        <td>@(item.SuKien != null ? item.SuKien.TenSK : "N/A")</td>
+                        <td title="@item.content">
+                            @{
+                                string content = item.content ?? "";
+                                if (content.Length > 150)
+                                {
+                                    @content.Substring(0, 150)<span>...</span>
+                                }
+                                else
+                                {
+                                    @content
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (item.ScheduledDate.HasValue)
+                            {
+                                <span>@item.ScheduledDate.Value.ToString("dd/MM/yyyy") @item.ScheduledTime?.ToString(@"hh\:mm")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa đặt lịch</span> <br />
+                                <button type="button" class="btn btn-sm btn-primary btn-sm btn-edit"
+                                        data-id="@item.notification_id"
+                                        data-mask="@item.MaSK"
+                                        data-title="@item.title"
+                                        data-content="@item.content">
+                                    Đặt Lịch
+                                </button>
+                            }
+                        </td>
+                        <td>
+                            @(item.sent_at.HasValue ? item.sent_at.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa gửi")
+                        </td>
+
+                        <td>
+                            <div class="d-flex" style="display: flex; gap: 5px; align-items: center;">
+                                <form asp-controller="ThongBao" asp-action="GuiThongBaoTuDong" method="post" class="me-2">
+                                    <input type="hidden" name="notification_id" value="@item.notification_id" />
+                                    <button type="submit" class="btn btn-info btn-sm" onclick="return confirm('Bạn có chắc muốn gửi?')">Gửi</button>
+                                </form>
+
+                                <button type="button" class="btn btn-warning btn-sm btn-edit"
+                                        data-id="@item.notification_id"
+                                        data-mask="@item.MaSK"
+                                        data-title="@item.title"
+                                        data-content="@item.content"
+                                        data-date="@item.ScheduledDate?.ToString("yyyy-MM-dd")"
+                                        data-time="@item.ScheduledTime?.ToString(@"hh\:mm")">
+                                    Sửa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+    <script>
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function () {
+                // Đổ dữ liệu vào form
+                document.getElementById('form_id').value = this.getAttribute('data-id');
+                document.getElementById('form_maSK').value = this.getAttribute('data-mask');
+                document.getElementById('form_title').value = this.getAttribute('data-title');
+                document.getElementById('form_content').value = this.getAttribute('data-content');
+
+                // Đổi tiêu đề nút
+                document.getElementById('btnSubmit').innerText = "Cập nhật lịch gửi";
+                document.getElementById('btnSubmit').className = "btn btn-warning mt-3";
+                document.getElementById('btnHuy').style.display = "inline-block"
+
+                // Cuộn lên đầu trang
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+

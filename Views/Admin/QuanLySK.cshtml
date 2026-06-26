@@ -1,0 +1,164 @@
+﻿@model IEnumerable<DA09_QLSK.Models.SuKien>
+
+@{
+    ViewData["Title"] = "Quản lý sự kiện";
+
+    // Breadcrumb: Thiết lập đường dẫn điều hướng
+
+    ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+        ("Quản lý sự kiện", null)
+    };
+
+    // Tính toán STT tự động theo trang
+    int currentPage = (int)(ViewBag.Page ?? 1);
+    int stt = (currentPage - 1) * 10 + 1;
+}
+
+<div class="container mt-4">
+    <partial name="_Breadcrumb" />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Danh sách sự kiện</h2>
+        <a asp-controller="Them" asp-action="ThemSK" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm sự kiện mới
+        </a>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th style="width: 50px;">STT</th>
+                <th>Mã SK</th>
+                <th>Tên sự kiện</th>
+                <th>Ngày bắt đầu</th>
+                <th>Địa điểm</th>
+                <th style="width: 150px;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(stt++)</td>
+                    <td>@item.MaSK</td>
+                    <td>@item.TenSK</td>
+                    <td>@item.start_date?.ToString("dd/MM/yyyy")</td>
+                    <td>@item.DiaDiem</td>
+                    <td>
+                        <div class="d-flex" style="gap: 5px;">
+                            <a asp-controller="Sua" asp-action="ChiTietSK" asp-route-id="@item.MaSK" class="btn btn-sm btn-info">Xem</a>
+                            <a asp-controller="Sua" asp-action="SuaSK" asp-route-id="@item.MaSK" class="btn btn-sm btn-warning">Sửa</a>
+
+                            <button type="button" class="btn btn-sm btn-danger"
+                                    onclick="openDeleteModal('@item.MaSK', '@item.TenSK')">
+                                Xóa
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= (int)(ViewBag.TotalPages ?? 1); i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="QuanLySK" asp-route-page="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa sự kiện "<span id="delTenSK" style="font-weight:bold;"></span>" không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không xóa</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thông báo</h5>
+                </div>
+                <div class="modal-body">
+                    Bạn đã xóa sự kiện "<span id="successTenSK" style="font-weight:bold;"></span>" thành công!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="location.reload()">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        let currentMaSK = '';
+        let currentTenSK = '';
+
+        // Hàm mở modal và gán giá trị
+        function openDeleteModal(id, ten) {
+            currentMaSK = id;
+            currentTenSK = ten;
+            document.getElementById('delTenSK').innerText = ten;
+            $('#deleteModal').modal('show');
+        }
+
+        // Hàm thực hiện xóa qua Ajax
+        function confirmDelete() {
+            $.ajax({
+                url: '/Xoa/DeleteSK',
+                type: 'POST',
+                data: {
+                    id: currentMaSK,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (res) {
+                    if (res.success) {
+                        // 1. Ẩn modal xác nhận
+                        $('#deleteModal').modal('hide');
+
+                        // 2. Gán tên vào modal thành công
+                        document.getElementById('successTenSK').innerText = currentTenSK;
+
+                        // 3. Hiện modal thông báo thành công
+                        $('#successModal').modal('show');
+                    } else {
+                        alert('Lỗi: ' + res.message);
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra!');
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.37301.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DA09_QLSK", "DA09_QLSK.csproj", "{5545F1EC-06AF-479C-A5A9-E837AF19FFCD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5545F1EC-06AF-479C-A5A9-E837AF19FFCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5545F1EC-06AF-479C-A5A9-E837AF19FFCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5545F1EC-06AF-479C-A5A9-E837AF19FFCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5545F1EC-06AF-479C-A5A9-E837AF19FFCD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65CCCFE7-8639-4EF5-97D6-4743372BF9FE}
+	EndGlobalSection
+EndGlobal

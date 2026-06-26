@@ -1,0 +1,105 @@
+﻿@model IEnumerable<DA09_QLSK.Models.PhanCongViewModel>
+@{
+    var suKien = (DA09_QLSK.Models.SuKien)ViewBag.SuKien;
+    ViewData["Title"] = "Chi tiết phân công";
+}
+
+<div class="container mt-4">
+    <h3>Sự kiện: @suKien.TenSK</h3>
+    <hr />
+
+    <form id="formPhanCong" class="mb-4 bg-light p-3 border rounded">
+        <input type="hidden" name="MaSK" value="@suKien.MaSK" />
+        <div class="row">
+            <div class="col-md-4">
+                <select name="Account_id" asp-items="ViewBag.SinhVienList" class="form-control" required>
+                    <option value="">-- Chọn sinh viên --</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="NhiemVu" id="inputNhiemVu" class="form-control" placeholder="Nhập nhiệm vụ..." required />
+            </div>
+            <div class="col-md-3">
+                <button type="button" id="btnGiaoViec" class="btn btn-success w-100">Giao nhiệm vụ</button>
+            </div>
+        </div>
+    </form>
+    
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th style="width: 50px;">No.</th>
+                <th>Tên Sinh viên</th>
+                <th>Nhiệm vụ</th>
+                <th>Thời gian</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody id="tbodyPhanCong">
+            @{
+                int stt = 1; // Khởi tạo biến đếm
+            }
+            @foreach (var item in Model)
+            {
+                <tr id="row-@item.PhanCong.MaPC">
+                    <td>@(stt++)</td>
+                    <td>@item.TenSV</td>
+                    <td>@item.PhanCong.NhiemVu</td>
+                    <td>@item.PhanCong.ThoiGianPhanCong?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm btn-xoa"
+                                data-id="@item.PhanCong.MaPC">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            // 1. Giao nhiệm vụ
+            $('#btnGiaoViec').click(function () {
+                var formData = $('#formPhanCong').serialize();
+                $.ajax({
+                    url: '@Url.Action("LuuPhanCong", "PhanCong")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (res) {
+                        if (res.success) {
+                            location.reload(); // Tải lại trang sau khi lưu
+                        } else {
+                            alert("Có lỗi xảy ra khi lưu!");
+                        }
+                    }
+                });
+            });
+
+            // 2. Xóa nhiệm vụ
+            $(document).on('click', '.btn-xoa', function () {
+                var maPC = $(this).data('id');
+                if (confirm("Bạn có chắc chắn muốn xóa nhiệm vụ này không?")) {
+                    $.ajax({
+                        url: '@Url.Action("XoaPhanCong", "PhanCong")',
+                        type: 'POST',
+                        data: { maPC: maPC },
+                        success: function (res) {
+                            if (res.success) {
+                                location.reload(); // Tải lại trang sau khi xóa
+                            } else {
+                                alert("Lỗi khi xóa!");
+                            }
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+}

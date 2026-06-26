@@ -1,0 +1,63 @@
+﻿@model IEnumerable<DA09_QLSK.Models.DangKyViewModel>
+
+@{
+    ViewData["Title"] = "Danh sách sinh viên đăng ký";
+}
+
+<div class="container mt-4">
+    <h3 class="justify-content-center" style=" text-align: center">
+        Danh sách sinh viên đăng ký tham gia:
+        <span class="text-primary">@ViewBag.TenSK</span>
+        <small class="text-muted">(@ViewBag.MaSK)</small>
+    </h3>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning">
+            Sự kiện @ViewBag.TenSK chưa có sinh viên đăng ký.
+        </div>
+        <a href="javascript:history.back()" class="btn btn-secondary">Quay lại</a>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Mã SV</th>
+                    <th>Tên Sinh viên</th>
+                    <th>Khoa</th>
+                    <th>Ngày đăng ký</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int stt = (ViewBag.Page - 1) * 10 + 1; }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(stt++)</td>
+                        <td>@item.MaSV</td>
+                        <td>@item.TenSV</td>
+                        <td>@item.TenKhoa</td>
+                        <td>@item.NgayDK?.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div>
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                        <a class="page-link" asp-action="DanhSachDK"
+                           asp-route-maSK="@ViewBag.MaSK" asp-route-page="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div><a href="javascript:history.back()" class="btn btn-secondary">Quay lại</a>
+        </div>
+    }
+</div>

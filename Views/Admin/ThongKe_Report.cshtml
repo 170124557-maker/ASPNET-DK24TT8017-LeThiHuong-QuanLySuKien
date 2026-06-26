@@ -1,0 +1,137 @@
+﻿@model IEnumerable<DA09_QLSK.Models.ThongKe_Report>
+
+@{ ViewData["Title"] = "Thống Kê-Report";
+                ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+        {
+       // ("Thống Kê-Report", "/Admin/ThongKe"),
+        ("Thống Kê-Report", null)
+    }; }
+
+<partial name="~/Views/Shared/_Breadcrumb.cshtml" />
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="font-weight-bold text-primary">Dashboard Thống kê</h2>
+            <p class="text-muted">Chọn các điều kiện bên dưới để lọc danh sách sự kiện</p>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            @*5555555555555555*@
+            <form asp-action="ThongKe" method="get" class="row align-items-end">
+                <div class="col-md-3">
+                    <label>Chọn Khoa:</label>
+                    <select name="khoa" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- Tất cả các khoa --</option>
+                        @if (ViewBag.KhoaList != null)
+                        {
+                            foreach (var k in (List<DA09_QLSK.Models.Khoa>)ViewBag.KhoaList)
+                            {
+                                <option value="@k.MaKhoa" selected="@(ViewBag.SelectedKhoa == k.MaKhoa)">@k.TenKhoa</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Trạng thái:</label>
+                    <select name="trangThai" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- Tất cả trạng thái --</option>
+                        @if (ViewBag.TrangThaiList != null)
+                        {
+                            foreach (var tt in (List<string>)ViewBag.TrangThaiList)
+                            {
+                                <option value="@tt" selected="@(ViewBag.SelectedTrangThai == tt)">@tt</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Lĩnh vực:</label>
+                    <select name="loaiSK" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- Tất cả lĩnh vực --</option>
+                        @if (ViewBag.LoaiSKList != null)
+                        {
+                            foreach (var item in (List<DA09_QLSK.Models.PhanLoaiSK>)ViewBag.LoaiSKList)
+                            {
+                                <option value="@item.MaLoaiSK" selected="@(ViewBag.SelectedLoaiSK == item.MaLoaiSK)">
+                                    @item.TenLoai
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                @* XỬ LÝ NÚT EXPORT THEO ĐIỀU KIỆN LỌC*@
+                <div class="col-md-3 d-flex align-items-end">
+                    <a asp-action="ThongKe" class="btn btn-secondary w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    @*44444444444444*@
+
+    @* XỬ LÝ NÚT EXPORT THEO ĐIỀU KIỆN LỌC*@
+    <div class="d-flex justify-content-end mb-3">
+        <div class="text-end">
+            <a href="@Url.Action("ExportExcel", new {
+                khoa = ViewBag.SelectedKhoa,
+                trangThai = ViewBag.SelectedTrangThai,
+                loaiSK = ViewBag.SelectedLoaiSK
+            })" class="btn btn-success">Xuất Excel</a>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên sự kiện</th>
+                <th>Lĩnh vực</th>
+                <th>Khoa</th>
+                <th>Thời gian</th>
+                <th>Đăng ký</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                // Tính STT bắt đầu cho mỗi trang
+                int stt = (ViewBag.CurrentPage - 1) * 10 + 1;
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(stt++)</td>
+                    <td>@item.TenSK</td>
+                    <td>@item.TenLoai</td>
+                    <td>@item.TenKhoa</td>
+                    <td>
+                        @(item.start_date?.ToString("dd/MM/yyyy")) @(item.Start_time?.ToString(@"hh\:mm"))
+                        -
+                        @(item.end_date?.ToString("dd/MM/yyyy")) @(item.End_time?.ToString(@"hh\:mm"))
+                    </td>
+                    <td>@item.SoLuongDK / @(item.SoLuongGioiHan ?? 0)</td>
+                    <td>@item.TrangThai</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("ThongKe", new {
+                        page = i,
+                        khoa = ViewBag.SelectedKhoa,
+                        trangThai = ViewBag.SelectedTrangThai,
+                        loaiSK = ViewBag.SelectedLoaiSK
+                    })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>

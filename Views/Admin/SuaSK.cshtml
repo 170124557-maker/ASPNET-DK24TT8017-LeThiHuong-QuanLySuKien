@@ -1,0 +1,136 @@
+﻿@model DA09_QLSK.Models.SuKien
+
+@{
+    ViewData["Title"] = "Sửa sự kiện";
+    ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+        ("Quản lý sự kiện", "/QuanLySK/QuanLySK"),
+        ("Sửa sự kiện", null)
+    };
+}
+
+<div class="container mt-4">
+    <partial name="_Breadcrumb" />
+    <h2 class="mb-4">Chỉnh sửa thông tin sự kiện: @Model.MaSK</h2>
+
+    <form asp-controller="Sua" asp-action="SuaSK" method="post">
+        <input type="hidden" asp-for="MaSK" />
+
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label>Mã sự kiện</label>
+                <input class="form-control" value="@Model.MaSK" readonly />
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Tên sự kiện</label>
+                <input asp-for="TenSK" class="form-control" required />
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Loại sự kiện</label>
+                <select asp-for="MaLoaiSK" class="form-control">
+                    <option value="">-- Chọn loại sự kiện --</option>
+                    @if (ViewBag.LoaiSKList != null)
+                    {
+                        @foreach (var loai in (List<DA09_QLSK.Models.PhanLoaiSK>)ViewBag.LoaiSKList)
+                        {
+                            <option value="@loai.MaLoaiSK">@loai.TenLoai</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Số người tham gia tối đa</label>
+                <input asp-for="max_participants" type="number" class="form-control" />
+            </div>
+
+            <div class="col-12 form-group">
+                <label>Mô tả</label>
+                <textarea asp-for="MotaSK" id="motaInput" class="form-control" rows="3" maxlength="500" oninput="checkLength(this)"></textarea>
+                <small id="charCountDisplay" class="text-muted">
+                    Cho phép nhập 500 ký tự (Đã nhập: <span id="currentCount">0</span>/500)
+                </small>
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Ngày bắt đầu</label>
+                <input asp-for="start_date" type="date" class="form-control" value="@Model.start_date?.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Ngày kết thúc</label>
+                <input asp-for="end_date" type="date" class="form-control" value="@Model.end_date?.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Giờ bắt đầu</label>
+                <input asp-for="Start_time" type="time" class="form-control" />
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Giờ kết thúc</label>
+                <input asp-for="End_time" type="time" class="form-control" />
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Địa điểm</label>
+                <input asp-for="DiaDiem" class="form-control" />
+            </div>
+            <div class="col-md-6 form-group">
+                <label>Đơn vị tổ chức (Khoa)</label>
+                <select asp-for="MaKhoa" class="form-control" required>
+                    <option value="">-- Chọn khoa --</option>
+                    @if (ViewBag.KhoaList != null)
+                    {
+                        @foreach (var khoa in (List<DA09_QLSK.Models.Khoa>)ViewBag.KhoaList)
+                        {
+                            <option value="@khoa.MaKhoa">@khoa.TenKhoa</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6 form-group">
+                <label>Trạng thái</label>
+                <select asp-for="TrangThai" class="form-control">
+                    <option value="Chưa diễn ra">Chưa diễn ra</option>
+                    <option value="Đang diễn ra">Đang diễn ra</option>
+                    <option value="Đã diễn ra">Đã diễn ra</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                </select>
+            </div>
+
+            <div class="col-12 form-group">
+                <label>QR Code Token</label>
+                <input asp-for="qr_code_token" class="form-control" readonly style="background-color: #e9ecef;" />
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success px-4">Lưu thay đổi</button>
+            <a href="/QuanLySK/QuanLySK" class="btn btn-secondary px-4">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function checkLength(textarea) {
+            var len = textarea.value.length;
+            var display = document.getElementById('charCountDisplay');
+            var count = document.getElementById('currentCount');
+            count.innerText = len;
+            if (len >= 450) {
+                display.style.color = 'red';
+                display.style.fontWeight = 'bold';
+            } else {
+                display.style.color = '#6c757d';
+                display.style.fontWeight = 'normal';
+            }
+        }
+        // Gọi hàm khi trang load để cập nhật số liệu ban đầu
+        window.onload = function () { checkLength(document.getElementById('motaInput')); };
+    </script>
+}

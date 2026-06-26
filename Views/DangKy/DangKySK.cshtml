@@ -1,0 +1,24 @@
+﻿@model IEnumerable<DA09_QLSK.Models.DangKy>
+
+<div class="container mt-4">
+    <h2>Danh sách sự kiện đã đăng ký</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã sự kiện</th>
+                <th>Ngày đăng ký</th>
+                <th>Trạng thái điểm danh</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.MaSK</td>
+                    <td>@item.registration_date?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@(item.is_attended ? "Đã tham gia" : "Chưa tham gia")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

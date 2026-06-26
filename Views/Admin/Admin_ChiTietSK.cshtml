@@ -1,0 +1,48 @@
+﻿@model DA09_QLSK.Models.SuKien
+
+@{
+    ViewData["Title"] = "Chi tiết sự kiện";
+    ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+        ("Quản lý sự kiện", "/QuanLySK/QuanLySK"),
+        ("Chi tiết sự kiện", null)
+    };
+}
+
+<div class="container mt-4">
+    <partial name="_Breadcrumb" />
+    <h2 class="mb-4">Thông tin sự kiện: @Model.TenSK</h2>
+
+    <div class="card shadow-sm p-4">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Mã SK: </strong> @Model.MaSK</p>
+                <p><strong>Tên sự kiện: </strong> @Model.TenSK</p>
+                <p><strong>Loại sự kiện: </strong> @(Model.PhanLoaiSK?.TenLoai ?? "Chưa phân loại")</p>
+                <p><strong>Ngày bắt đầu: </strong> @Model.start_date?.ToString("dd/MM/yyyy")</p>
+                <p><strong>Ngày kết thúc: </strong> @Model.end_date?.ToString("dd/MM/yyyy")</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Giờ bắt đầu: </strong> @Model.Start_time</p>
+                <p><strong>Giờ kết thúc: </strong> @Model.End_time</p>
+                <p><strong>Địa điểm: </strong> @Model.DiaDiem</p>
+                <p><strong>Số người tối đa: </strong> @Model.max_participants</p>
+                <p> <strong> Đơn vị tổ chức (Khoa): </strong>@ViewBag.TenKhoa</p>
+                <p><strong>Trạng thái: </strong> <span class="badge badge-primary">@Model.TrangThai</span></p>
+            </div>
+        </div>
+        <hr />
+        <p><strong>Mô tả:</strong></p>
+        <div class="p-3 bg-light border rounded">@Model.MotaSK</div>
+
+        <p class="mt-3 text-muted"><strong>QR Code Token:</strong> @Model.qr_code_token</p>
+    </div>
+
+    <div class="mt-4">
+        <a href="/QuanLySK/QuanLySK" class="btn btn-secondary">Quay lại danh sách</a>
+
+        <a asp-controller="Sua" asp-action="SuaSK" asp-route-id="@Model.MaSK" class="btn btn-warning px-4">
+            <i class="fas fa-edit"></i> Chỉnh sửa sự kiện
+        </a>
+    </div>
+</div>

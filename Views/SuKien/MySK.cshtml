@@ -1,0 +1,81 @@
+﻿@model IEnumerable<DA09_QLSK.Models.SuKien>
+
+@{
+    ViewData["Title"] = "Sự kiện của tôi";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int pageSize = 10;
+    int stt = ((currentPage - 1) * pageSize) + 1;
+}
+
+
+<div class="container my-5">
+    <h2 class="font-weight-bold mb-4">Danh sách sự kiện đã đăng ký</h2>
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>No.</th>
+                <th>Tên sự kiện</th>
+                <th>Thời gian</th>
+                <th>Địa điểm</th>
+                <th>Tình trạng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Kiểm tra nếu Model khác null VÀ có phần tử *@
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@stt</td>
+                        <td>
+                            @item.TenSK ...<br /><a href="@Url.Action("ChiTietSK", "Home", new { id = item.MaSK })" class="text-primary">Xem chi tiết</a>
+                        </td>
+                        <td>
+                            @item.start_date?.ToString("dd/MM/yyyy")  @(item.Start_time?.ToString("hh\\:mm") ?? "") -  
+                            @item.end_date?.ToString("dd/MM/yyyy")  @(item.End_time?.ToString("hh\\:mm") ?? "")
+                        </td>
+                        <td>@item.DiaDiem</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">
+                            @if (item.TrangThai == "Đang diễn ra")
+                            {
+                                <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #28a745;">Đang diễn ra</span>
+                                <br />
+                                <a href="@Url.Action("DiemDanh", "DiemDanh", new { maSK = item.MaSK })"
+                                   class="hover-diemdanh">
+                                    Điểm danh
+                                </a>
+
+                            }
+                            else if (item.TrangThai == "Chưa diễn ra")
+                            {
+                                <span class="badge" style="padding: 6px 10px; color: #212529; border-radius: 4px; font-weight: bold; background-color: #ffc107;">Chưa diễn ra</span>
+                            }
+                            else if (item.TrangThai == "Đã Hủy")
+                            {
+                                <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #dc3545;">Đã Hủy</span>
+                            }
+                            else
+                            {
+                                <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #6c757d;">Đã kết thúc</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                @* Đoạn code hiển thị thông báo khi chưa có đăng ký *@
+                <tr>
+                    <td colspan="5" class="text-center py-4">
+                        <div class="alert alert-warning mb-0">
+                            <strong>Thông báo:</strong> Bạn chưa đăng ký sự kiện nào
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

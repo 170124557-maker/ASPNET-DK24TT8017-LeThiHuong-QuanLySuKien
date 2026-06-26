@@ -1,0 +1,152 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Tìm Kiếm Sự Kiện Theo Khoa";
+    int stt = 1;
+    string tuKhoaDaNhap = ViewBag.TuKhoaDaNhap ?? "";
+}
+
+<div class="container-fluid my-4">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-info text-white py-3">
+            <h5 class="mb-0 font-weight-bold text-center">🔍 TÌM KIẾM SỰ KIỆN THEO KHOA</h5>
+        </div>
+        <div class="card-body bg-light border-bottom py-3">
+            <form method="get" action="@Url.Action("TimKiem", "Home")" class="form-inline justify-content-center">
+                <div class="form-group mx-sm-3 mb-2" style="width: 50%;">
+                    <input type="text"
+                           id="tuKhoa"
+                           name="tuKhoa"
+                           class="form-control w-100"
+                           value="@tuKhoaDaNhap"
+                           placeholder="Nhập tên khoa hoặc mã khoa cần tìm... (Ví dụ: CNTT, Cơ khí)"
+                           required />
+                </div>
+                <button type="submit" class="btn btn-info mb-2 font-weight-bold px-4">
+                    <i class="fas fa-search mr-1"></i> Tìm kiếm
+                </button>
+            </form>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0" style="font-size: 13px;">
+                    <thead class="thead-light text-center">
+                        <tr>
+                            <th style="width: 50px;">No.</th>
+                            <th>Tên Sự Kiện</th>
+                            <th>Tên Khoa</th>
+                            <th>Thể Loại</th>
+                            <th>Ngày Bắt Đầu</th>
+                            <th>Ngày Kết Thúc</th>
+                            <th>Địa Điểm</th>
+                            <th style="width: 100px;">Giới Hạn</th>
+                            <th style="width: 120px;">Đã Đăng Ký</th>
+                            <th style="width: 120px;">Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center font-weight-bold text-muted">@(stt++)</td>
+
+                                    <td class="font-weight-bold text-primary" style="min-width: 180px;">@item.TenSK</td>
+
+                                    <td>@item.TenKhoa</td>
+
+                                    <td class="text-center font-weight-bold text-secondary">
+                                        @if (item.MaLoaiSK == "HuongNghiep" || item.MaLoaiSK == "Hướng Nghiệp")
+                                        {<span>Hướng Nghiệp</span> }
+                                        else if (item.MaLoaiSK == "VanNghe" || item.MaLoaiSK == "Văn Nghệ")
+                                        { <span>Văn Nghệ</span> }
+                                        else if (item.MaLoaiSK == "CLB")
+                                        { <span>Câu Lạc Bộ</span> }
+                                        else if (item.MaLoaiSK == "HocThuat")
+                                        { <span>Học Thuật</span> }
+                                        else if (item.MaLoaiSK == "TheThao")
+                                        { <span>Thể Thao</span> }
+                                        else
+                                        { <span>@(item.MaLoaiSK ?? "Khác")</span>}
+                                    </td>
+
+                                    <td class="text-center" style="min-width: 140px;">
+                                        @if (item.StartDate != null)
+                                        {
+                                            DateTime fullStart = (DateTime)item.StartDate;
+                                            if (item.StartTime != null && item.StartTime != TimeSpan.Zero)
+                                            {
+                                                fullStart = fullStart.Add((TimeSpan)item.StartTime);
+                                                @fullStart.ToString("dd/MM/yyyy HH:mm:ss")
+                                            }
+                                            else
+                                            {
+                                                @fullStart.ToString("dd/MM/yyyy")
+                                            }
+                                        }
+                                    </td>
+
+                                    <td class="text-center" style="min-width: 140px;">
+                                        @if (item.EndDate != null)
+                                        {
+                                            DateTime fullEnd = (DateTime)item.EndDate;
+                                            if (item.EndTime != null && item.EndTime != TimeSpan.Zero)
+                                            {
+                                                fullEnd = fullEnd.Add((TimeSpan)item.EndTime);
+                                                @fullEnd.ToString("dd/MM/yyyy HH:mm:ss")
+                                            }
+                                            else
+                                            {
+                                                @fullEnd.ToString("dd/MM/yyyy")
+                                            }
+                                        }
+                                    </td>
+
+                                    <td>@item.DiaDiem</td>
+
+                                    <td class="text-center font-weight-bold text-dark">
+                                        @(item.MaxParticipants != null ? item.MaxParticipants.ToString() : "Không giới hạn")
+                                    </td>
+
+                                    <td class="text-center font-weight-bold text-info bg-light">
+                                        @item.SoNguoiDaDangKy
+                                    </td>
+
+                                    <td class="text-center font-weight-bold">
+                                        @if (item.TrangThai == "Đã Hủy" || item.TrangThai == "Đã hủy")
+                                        {
+                                            <span class="badge badge-danger p-2 d-block">Đã Hủy</span>
+                                        }
+                                        else if (item.TrangThai == "Đang diễn ra")
+                                        {
+                                            <span class="badge badge-success p-2 d-block">Đang diễn ra</span>
+                                        }
+                                        else if (item.TrangThai == "Đã kết thúc" || item.TrangThai == "Đã diễn ra")
+                                        {
+                                            <span class="badge badge-secondary p-2 d-block">Đã kết thúc</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning p-2 d-block text-dark">@(item.TrangThai ?? "Chưa diễn ra")</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="10" class="text-center text-danger font-weight-bold p-4 bg-white" style="font-size: 14px; line-height: 1.6;">
+                                    ⚠️ Khoa chưa tổ chức hoạt động / Sự kiện nào! <br />
+                                    <span class="text-muted font-weight-normal">Sinh viên muốn đăng ký tham gia hoạt động vui lòng liên hệ phòng Công tác sinh viên.</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

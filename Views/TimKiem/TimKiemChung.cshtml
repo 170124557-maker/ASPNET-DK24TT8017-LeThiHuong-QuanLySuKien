@@ -1,0 +1,109 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Kết quả tìm kiếm sự kiện";
+}
+
+<div class="container mt-4">
+    <div class="text-center mb-4" style="background-color: #17a2b8; color: white; padding: 15px; border-radius: 4px;">
+        <h2 class="m-0" style="font-weight: bold; font-size: 24px;">🔍 KẾT QUẢ TÌM KIẾM SỰ KIỆN</h2>
+    </div>
+
+    <div class="card shadow-sm mb-4" style="border: 1px solid #ddd; border-radius: 4px; padding: 20px;">
+        <form method="get" action="/Home/TimKiemChung">
+            <div class="input-group">
+                <input type="text" name="tuKhoa" class="form-control" placeholder="Nhập tên sự kiện, khoa hoặc lĩnh vực..." value="@ViewBag.TuKhoaDaNhap" required />
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-info">Tìm kiếm</button>
+                </div>
+            </div>
+        </form>
+        @if (!string.IsNullOrEmpty(ViewBag.TuKhoaDaNhap))
+        {
+            <div class="mt-2 text-muted" style="margin-top: 10px; font-size: 14px;">
+                Kết quả tìm kiếm cho từ khóa: <strong style="color: #d9534f;">"@ViewBag.TuKhoaDaNhap"</strong>
+            </div>
+        }
+    </div>
+
+    <div class="card shadow-sm" style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+        <div class="card-body" style="padding: 0;">
+            @if (Model != null && Model.Any())
+            {
+                int stt = 1;
+                <table class="table table-bordered table-striped" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead style="background-color: #e9ecef; font-weight: bold; text-align: center;">
+                        <tr>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 4%;">STT</th>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 20%;">Tên Sự Kiện</th>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 14%;">Tên Khoa</th>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 11%;">Lĩnh Vực</th>
+                            
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 13%;">Ngày Bắt Đầu</th>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 13%;">Ngày Kết Thúc</th>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 11%;">Địa Điểm</th>
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 8%;">Đã Đăng Ký</th>
+                            
+                            <th style="padding: 12px; border: 1px solid #dee2e6; width: 10%;">Trạng Thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">@stt</td>
+                            <td style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">
+                                @item.TenSK ...<a href="@Url.Action("ChiTietSK", "Home", new { id = item.MaSK })" class="text-primary">Xem chi tiết</a>
+                            
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #dee2e6;">@item.TenKhoa</td>
+                            <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">@item.TenLoaiSK</td>
+
+                            <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">@item.StartDateStr</td>
+                            <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">@item.EndDateStr</td>
+
+                            <td style="padding: 12px; border: 1px solid #dee2e6;">@item.DiaDiem</td>
+
+                            <td>
+                                @{ // Giả sử item là đối tượng sự kiện hiện tại
+                                    // Bạn lấy số lượng đã đăng ký (thường được truyền từ Controller hoặc đếm từ bảng DangKy)
+                                    var soDaDangKy = item.SoNguoiDaDangKy;
+
+                                    // Lấy giới hạn tối đa (tên thuộc tính có thể là MaxParticipants hoặc GioiHan)
+                                    var tongSo = item.MaxParticipants; }
+                                @soDaDangKy / @tongSo
+                            </td>
+
+                            <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">
+                                @if (item.TrangThai == "Đang diễn ra")
+                                {
+                                    <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #28a745;">Đang diễn ra</span>
+                                }
+                                else if (item.TrangThai == "Chưa diễn ra")
+                                {
+                                    <span class="badge" style="padding: 6px 10px; color: #212529; border-radius: 4px; font-weight: bold; background-color: #ffc107;">Chưa diễn ra</span>
+                                }
+                                else if (item.TrangThai == "Đã Hủy")
+                                {
+                                    <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #dc3545;">Đã Hủy</span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #6c757d;">Đã kết thúc</span>
+                                }
+                            </td>
+                        </tr>
+                            stt++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div style="padding: 30px; text-align: center; background-color: #fff3cd; color: #856404; font-weight: bold;">
+                    ⚠️ Không tìm thấy sự kiện nào tương thích với từ khóa của bạn!
+                </div>
+            }
+        </div>
+    </div>
+</div>

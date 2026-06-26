@@ -1,0 +1,51 @@
+﻿@model IEnumerable<DA09_QLSK.Models.Notification>
+
+    @{
+    ViewData["Title"] = "Danh sách thông báo";
+    }
+
+    @{
+    await Html.RenderPartialAsync("_Breadcrumb");
+    }
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Danh sách thông báo</h2>
+
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Số thứ tự</th>
+                    <th>Tiêu đề</th>
+                    <th>Nội dung</th>
+                    <th>Đã nhận</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>@(i++)</td>
+                    <td><strong>@item.title</strong></td>
+                    <td>@item.content</td>
+                    <td>
+                        @if (item.sent_at.HasValue)
+                        {
+                        @item.sent_at.Value.ToString("dd/MM/yyyy HH:mm")
+                        }
+                        else
+                        {
+                        <span class="text-muted">Chưa rõ</span>
+                        }
+                    </td>
+                </tr>
+                }
+                @if (!Model.Any())
+                {
+                <tr>
+                    <td colspan="4" class="text-center">Chưa có thông báo nào.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>

@@ -1,0 +1,112 @@
+﻿
+@model DA09_QLSK.Models.SuKien
+
+@{
+    ViewData["Title"] = "Thêm sự kiện mới";
+    // Breadcrumb: Thiết lập đường dẫn điều hướng
+    ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+        ("Quản lý sự kiện", "/QuanLySK/QuanLySK"),
+        ("Thêm sự kiện", null)
+    };
+}
+
+<div class="container mt-4">
+    <partial name="_Breadcrumb" />
+    <h2>Thêm Sự Kiện Mới</h2>
+    <hr />
+
+    <form asp-action="ThemSK" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="MaSK" value="@(Model?.MaSK ?? ViewBag.NewMaSK)" />
+        <input type="hidden" asp-for="qr_code_token" value="@(Model?.qr_code_token ?? ViewBag.QRCodeToken)" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label>Mã sự kiện</label>
+                    <input class="form-control" value="@(Model?.MaSK ?? ViewBag.NewMaSK)" readonly disabled />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Tên sự kiện</label>
+                    <input asp-for="TenSK" class="form-control" id="tenSK" maxlength="200" onkeyup="countChars(this, 'tenSKCount')" required />
+                    <div class="d-flex justify-content-between">
+                        <span asp-validation-for="TenSK" class="text-danger"></span>
+                        <small class="text-muted"><span id="tenSKCount">@(Model?.TenSK?.Length ?? 0)</span>/200</small>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Loại sự kiện</label>
+                    <select asp-for="MaLoaiSK" asp-items="ViewBag.LoaiSKList" class="form-control" required></select>
+                </div>
+                <div class="form-group mb-3">
+                    <label>Ngày bắt đầu</label>
+                    <input asp-for="start_date" type="date" class="form-control" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Giờ bắt đầu</label>
+                    <input asp-for="Start_time" type="time" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label>qr_code_token</label>
+                    <input class="form-control" value="@(Model?.qr_code_token ?? ViewBag.QRCodeToken)" readonly disabled />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Mô tả</label>
+                    <textarea asp-for="MotaSK" class="form-control" id="motaSK" maxlength="500" onkeyup="countChars(this, 'motaSKCount')" rows="3"></textarea>
+                    <div class="d-flex justify-content-between">
+                        <span asp-validation-for="MotaSK" class="text-danger"></span>
+                        <small class="text-muted"><span id="motaSKCount">@(Model?.MotaSK?.Length ?? 0)</span>/500</small>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label>Ngày kết thúc</label>
+                    <input asp-for="end_date" type="date" class="form-control" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Giờ kết thúc</label>
+                    <input asp-for="End_time" type="time" class="form-control" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Địa điểm</label>
+                    <input asp-for="DiaDiem" class="form-control" />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Số người tham gia</label>
+                    <input asp-for="max_participants" type="number" class="form-control" />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Trạng thái</label>
+                    <select asp-for="TrangThai" class="form-control">
+                        <option value="Sắp diễn ra">Sắp diễn ra</option>
+                        <option value="Đang diễn ra">Đang diễn ra</option>
+                        <option value="Đã kết thúc">Đã kết thúc</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Lưu sự kiện</button>
+            <a asp-controller="QuanLySK" asp-action="QuanLySK" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Hàm cập nhật bộ đếm ký tự trực tiếp
+        function countChars(obj, countId) {
+            document.getElementById(countId).innerText = obj.value.length;
+        }
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}

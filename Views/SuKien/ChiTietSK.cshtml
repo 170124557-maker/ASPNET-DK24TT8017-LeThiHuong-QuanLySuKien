@@ -1,0 +1,142 @@
+﻿@model DA09_QLSK.Models.SuKien
+@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+        // Sửa "/" thành đường dẫn trỏ đúng tới Action Index_SuKien của HomeController
+        ("Danh sách Sự Kiện", Url.Action("Index_SuKien", "Home")),
+        ("Chi Tiết Sự Kiện", null)
+    };
+
+    ViewData["Title"] = "Chi Tiết Sự Kiện";
+
+    string maSV = Context.Session.GetString("MaSV");
+    string hoTen = Context.Session.GetString("HoTenSV");
+
+    // Logic kiểm tra trạng thái và số lượng
+    string trangThai = (Model.TrangThai ?? "").Trim();
+    bool isAvailableStatus = trangThai.Equals("Chưa diễn ra", StringComparison.OrdinalIgnoreCase);
+
+    // GHI CHÚ: Thêm biến kiểm tra trạng thái "Đang diễn ra"
+    bool isHappening = trangThai.Equals("Đang diễn ra", StringComparison.OrdinalIgnoreCase);
+
+    int daDangKy = (int)(ViewBag.SoLuongDangKy ?? 0);
+    int toiDa = Model.max_participants ?? 0;
+    bool isFull = daDangKy >= toiDa;
+    bool isDisabled = !isAvailableStatus || isFull;
+
+    // Logic mới: Nút cho phép bấm khi chưa đầy và sự kiện chưa đóng
+    bool canClickButton = isAvailableStatus && !isFull;
+
+    // Message chỉ hiển thị khi: Chưa đăng nhập VÀ nút đang cho phép bấm
+    bool showLoginMessage = string.IsNullOrEmpty(maSV) && canClickButton;
+}
+
+<partial name="_Breadcrumb" />
+
+<style>
+    .btn:disabled, .btn[disabled] {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
+</style>
+
+<div class="container my-5">
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["ErrorMessage"]
+            @{ TempData.Remove("ErrorMessage"); }
+        </div>
+    }
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Message"]
+            @{ TempData.Remove("Message"); }
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <span class="badge badge-info">@Model.MaLoaiSK</span>
+
+            <h1 class="font-weight-bold">@Model.TenSK</h1>
+            <p class="text-muted">@Model.MotaSK</p>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 border-0">
+                <p>
+                    <strong>Thời gian:</strong><br /> @(Model.Start_time?.ToString("hh\\:mm") ?? "") @Model.start_date?.ToString("dd/MM/yyyy") - @(Model.End_time?.ToString("hh\\:mm") ?? "") @Model.end_date?.ToString("dd/MM/yyyy")
+                </p>
+                <p><strong>Địa điểm:</strong> @Model.DiaDiem</p>
+                <p><strong>Đơn vị tổ chức:</strong><br /> @ViewBag.TenDonVi</p>
+                <p>
+                    <strong>Số lượng đăng ký:</strong><br /> @ViewBag.SoLuongDangKy / @Model.max_participants
+                    <a asp-controller="DangKy"
+                       asp-action="DanhSachDK"
+                       asp-route-maSK="@Model.MaSK">
+
+                        Danh sách đã đăng ký
+                    </a>
+                </p>
+                <p>
+                    <strong> Trạng thái: </strong>
+
+                    @if (Model.TrangThai == "Đang diễn ra")
+                    {
+                        <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #28a745;">Đang diễn ra</span>
+                    }
+                    else if (Model.TrangThai == "Chưa diễn ra")
+                    {
+                        <span class="badge" style="padding: 6px 10px; color: #212529; border-radius: 4px; font-weight: bold; background-color: #ffc107;">Chưa diễn ra</span>
+                    }
+                    else if (Model.TrangThai == "Đã Hủy")
+                    {
+                        <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #dc3545;">Đã Hủy</span>
+                    }
+                    else
+                    {
+                        <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #6c757d;">Đã kết thúc</span>
+                    }
+                </p>
+
+                <form asp-controller="DangKy" asp-action="DangKyThamGia" method="post">
+                    <input type="hidden" name="maSK" value="@Model.MaSK" />
+                    <button type="submit"
+                            class="btn btn-primary btn-block"
+                            @(isDisabled ? "disabled" : "")>
+                        @if (isFull)
+                        {
+                            @: Đã đủ người
+                        }
+                        else if (!isAvailableStatus)
+                        {
+                            @: Sự kiện đã đóng
+                        }
+                        else
+                        {
+                            @: Đăng ký tham gia
+                        }
+                    </button>
+                </form>
+
+                @* GHI CHÚ: Nút Điểm danh hiển thị khi sự kiện Đang diễn ra *@
+                @if (isHappening)
+                {
+                    <div class="mt-3">
+                        @* Nút dẫn đến Action DiemDanh bên trên *@
+                        <a href="@Url.Action("DiemDanh", "DiemDanh", new { maSK = Model.MaSK })"
+                           class="btn btn-success btn-block font-weight-bold">
+                            Điểm danh sự kiện
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

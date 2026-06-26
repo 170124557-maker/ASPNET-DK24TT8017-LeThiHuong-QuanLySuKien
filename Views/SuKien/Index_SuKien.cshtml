@@ -1,0 +1,366 @@
+﻿@*
+
+    @model IEnumerable<DA09_QLSK.Models.SuKien>
+    @{ ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+    {
+           // ("Trang chủ", "/"),
+            ("Danh sách Sự Kiện",null)
+        }; }
+
+
+    @{
+        ViewData["Title"] = "Tất Cả Sự Kiện";
+            // Định nghĩa các cấp điều hướng
+
+
+
+
+     <partial name="_Breadcrumb" />
+
+        int currentPage = ViewBag.CurrentPage ?? 1;
+        int totalPages = ViewBag.TotalPages ?? 1;
+        int pageSize = 10;
+        int stt = ((currentPage - 1) * pageSize) + 1;
+
+        // Giữ lại các giá trị lọc hiện tại trên thanh công cụ
+        string currentKhoa = ViewBag.CurrentKhoa ?? "";
+        string currentLoai = ViewBag.CurrentLoai ?? "";
+        string tuNgay = ViewBag.TuNgay?.ToString("yyyy-MM-dd") ?? "";
+        string denNgay = ViewBag.DenNgay?.ToString("yyyy-MM-dd") ?? "";
+    }
+
+    <div class="container-fluid my-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0 font-weight-bold text-center">📋 DANH SÁCH TẤT CẢ SỰ KIỆN</h5>
+            </div>
+
+            <div class="card-body bg-light border-bottom py-3 px-3">
+                <form method="get" action="@Url.Action("Index_SuKien", "Home")">
+                    <div class="row align-items-end">
+                        <div class="col-md-2">
+                            <label class="small font-weight-bold">Khoa:</label>
+                            <select name="khoa" class="form-control form-control-sm">
+                                <option value="">-- Chọn Khoa --</option>
+                                @foreach (var k in ViewBag.KhoaList)
+                                {
+                                    <option value="@k.MaKhoa" selected="@(currentKhoa == k.MaKhoa)">@k.TenKhoa</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="small font-weight-bold">Lĩnh vực:</label>
+                            <select name="loai" class="form-control form-control-sm">
+                                <option value="">-- Tất cả --</option>
+                                @foreach (var l in ViewBag.LoaiList)
+                                {
+                                    <option value="@l.MaLoaiSK" selected="@(currentLoai == l.MaLoaiSK)">@l.TenLoai</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="small font-weight-bold">Từ ngày:</label>
+                            <input type="date" name="tuNgay" value="@tuNgay" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="small font-weight-bold">Đến ngày:</label>
+                            <input type="date" name="denNgay" value="@denNgay" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">Lọc dữ liệu</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="@Url.Action("Index_SuKien", "Home")" class="btn btn-secondary btn-sm w-100">Reset</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    @if (Model != null && Model.Any())
+                    {
+                        <table class="table table-bordered table-hover mb-0" style="font-size: 13px;">
+                            <thead class="thead-light text-center">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Tên Sự Kiện</th>
+                                    <th>Mô Tả</th>
+                                    <th>Lĩnh vực</th>
+                                    <th>Ngày Bắt Đầu</th>
+                                    <th>Ngày Kết Thúc</th>
+                                    <th>Địa Điểm</th>
+                                    <th>Số người đăng ký</th>
+                                    <th>Trạng Thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">@stt</td>
+
+                                        <td>
+                                            @item.TenSK ...<br /><a href="@Url.Action("ChiTietSK", "Home", new { id = item.MaSK })" class="text-primary">Xem chi tiết</a>
+                                        </td>
+                                        <td>@item.MotaSK</td>
+                                        <td>
+                                            @{
+                                                // HÀM TRA CỨU: Lấy tên lĩnh vực từ Dictionary truyền từ Controller thay vì hiển thị mã
+                                                var loaiDict = ViewBag.LoaiDict as Dictionary<string, string>;
+                                                string tenLoai = (loaiDict != null && item.MaLoaiSK != null && loaiDict.ContainsKey(item.MaLoaiSK))
+                                                               ? loaiDict[item.MaLoaiSK] : item.MaLoaiSK;
+                                            }
+                                            @tenLoai
+                                        </td>
+                                        <td>
+                                            @(item.start_date?.ToString("dd/MM/yyyy") ?? "")
+                                            @(item.Start_time?.ToString("hh\\:mm") ?? "")
+                                        </td>
+                                        <td>
+                                            @(item.end_date?.ToString("dd/MM/yyyy") ?? "")
+                                            @(item.End_time?.ToString("hh\\:mm") ?? "")
+                                        </td>
+                                        <td>@item.DiaDiem</td>
+                                        <td>
+                                            @{
+                                                // HÀM TÍNH TOÁN: Lấy số người đã đăng ký từ Dictionary và giới hạn tối đa
+                                                var countDict = ViewBag.CountDict as Dictionary<string, int>;
+                                                int daDangKy = (countDict != null && countDict.ContainsKey(item.MaSK)) ? countDict[item.MaSK] : 0;
+                                                int tongSo = item.max_participants ?? 0;
+                                            }
+                                            @daDangKy / @tongSo
+                                        </td>
+
+                                        <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">
+                                            @if (item.TrangThai == "Đang diễn ra")
+                                            {
+                                                <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #28a745;">Đang diễn ra</span>
+                                            }
+                                            else if (item.TrangThai == "Chưa diễn ra")
+                                            {
+                                                <span class="badge" style="padding: 6px 10px; color: #212529; border-radius: 4px; font-weight: bold; background-color: #ffc107;">Chưa diễn ra</span>
+                                            }
+                                            else if (item.TrangThai == "Đã Hủy")
+                                            {
+                                                <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #dc3545;">Đã Hủy</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #6c757d;">Đã kết thúc</span>
+                                            }
+                                        </td>
+
+
+
+                                    </tr>
+                                    stt++;
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center" style="margin: 30px; padding: 20px;">
+                            <h4 class="mb-0">Không có sự kiện như bạn cần!!</h4>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (totalPages > 1)
+            {
+                <div class="card-footer bg-white d-flex justify-content-center">
+                    <ul class="pagination">
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(currentPage == i ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index_SuKien", "Home", new { page = i, khoa = currentKhoa, loai = currentLoai, tuNgay = tuNgay, denNgay = denNgay })">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+*@
+@model IEnumerable<DA09_QLSK.Models.SuKien>
+@{ ViewData["Breadcrumb"] = new List<(string Title, string Url)>
+{
+       // ("Trang chủ", "/"),
+        ("Danh sách Sự Kiện",null)
+    }; }
+
+
+@{
+    ViewData["Title"] = "Tất Cả Sự Kiện";
+    // Định nghĩa các cấp điều hướng
+
+    <partial name="_Breadcrumb" />
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int pageSize = 10;
+    int stt = ((currentPage - 1) * pageSize) + 1;
+
+    // Giữ lại các giá trị lọc hiện tại trên thanh công cụ
+    string currentKhoa = ViewBag.CurrentKhoa ?? "";
+    string currentLoai = ViewBag.CurrentLoai ?? "";
+    string tuNgay = ViewBag.TuNgay?.ToString("yyyy-MM-dd") ?? "";
+    string denNgay = ViewBag.DenNgay?.ToString("yyyy-MM-dd") ?? "";
+}
+
+<div class="container-fluid my-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0 font-weight-bold text-center">📋 DANH SÁCH TẤT CẢ SỰ KIỆN</h5>
+        </div>
+
+        <div class="card-body bg-light border-bottom py-3 px-3">
+            <form method="get" action="@Url.Action("Index_SuKien", "Home")">
+                <div class="row align-items-end">
+                    <div class="col-md-2">
+                        <label class="small font-weight-bold">Khoa:</label>
+                        <select name="khoa" class="form-control form-control-sm">
+                            <option value="">-- Chọn Khoa --</option>
+                            @foreach (var k in ViewBag.KhoaList)
+                            {
+                                <option value="@k.MaKhoa" selected="@(currentKhoa == k.MaKhoa)">@k.TenKhoa</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="small font-weight-bold">Lĩnh vực:</label>
+                        <select name="loai" class="form-control form-control-sm">
+                            <option value="">-- Tất cả --</option>
+                            @foreach (var l in ViewBag.LoaiList)
+                            {
+                                <option value="@l.MaLoaiSK" selected="@(currentLoai == l.MaLoaiSK)">@l.TenLoai</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="small font-weight-bold">Từ ngày:</label>
+                        <input type="date" name="tuNgay" value="@tuNgay" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="small font-weight-bold">Đến ngày:</label>
+                        <input type="date" name="denNgay" value="@denNgay" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Lọc dữ liệu</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="@Url.Action("Index_SuKien", "Home")" class="btn btn-secondary btn-sm w-100">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                @if (Model != null && Model.Any())
+                {
+                    <table class="table table-bordered table-hover mb-0" style="font-size: 13px;">
+                        <thead class="thead-light text-center">
+                            <tr>
+                                <th>No.</th>
+                                <th>Tên Sự Kiện</th>
+                                <th>Mô Tả</th>
+                                <th>Lĩnh vực</th>
+                                <th>Ngày Bắt Đầu</th>
+                                <th>Ngày Kết Thúc</th>
+                                <th>Địa Điểm</th>
+                                <th>Số người đăng ký</th>
+                                <th>Trạng Thái</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center">@stt</td>
+
+                                    <td>
+                                        @item.TenSK ...<br /><a href="@Url.Action("ChiTietSK", "Home", new { id = item.MaSK })" class="text-primary">Xem chi tiết</a>
+                                    </td>
+                                    <td>@item.MotaSK</td>
+                                    <td>
+                                        @{
+                                            var loaiDict = ViewBag.LoaiDict as Dictionary<string, string>;
+                                            string tenLoai = (loaiDict != null && item.MaLoaiSK != null && loaiDict.ContainsKey(item.MaLoaiSK))
+                                                             ? loaiDict[item.MaLoaiSK] : item.MaLoaiSK;
+                                        }
+                                        @tenLoai
+                                    </td>
+                                    <td>
+                                        @(item.start_date?.ToString("dd/MM/yyyy") ?? "")
+                                        @(item.Start_time?.ToString("hh\\:mm") ?? "")
+                                    </td>
+                                    <td>
+                                        @(item.end_date?.ToString("dd/MM/yyyy") ?? "")
+                                        @(item.End_time?.ToString("hh\\:mm") ?? "")
+                                    </td>
+                                    <td>@item.DiaDiem</td>
+                                    <td>
+                                        @{
+                                            var countDict = ViewBag.CountDict as Dictionary<string, int>;
+                                            int daDangKy = (countDict != null && countDict.ContainsKey(item.MaSK)) ? countDict[item.MaSK] : 0;
+                                            int tongSo = item.max_participants ?? 0;
+                                        }
+                                        @daDangKy / @tongSo
+                                    </td>
+
+                                    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">
+                                        @if (item.TrangThai == "Đang diễn ra")
+                                        {
+                                            <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #28a745;">Đang diễn ra</span>
+                                                                                    
+
+                                        }
+                                        else if (item.TrangThai == "Chưa diễn ra")
+                                        {
+                                            <span class="badge" style="padding: 6px 10px; color: #212529; border-radius: 4px; font-weight: bold; background-color: #ffc107;">Chưa diễn ra</span>
+                                        }
+                                        else if (item.TrangThai == "Đã Hủy")
+                                        {
+                                            <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #dc3545;">Đã Hủy</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge" style="padding: 6px 10px; color: white; border-radius: 4px; font-weight: bold; background-color: #6c757d;">Đã kết thúc</span>
+                                        }
+                                    </td>
+
+                                   
+                                </tr>
+                                stt++;
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-center" style="margin: 30px; padding: 20px;">
+                        <h4 class="mb-0">Không có sự kiện như bạn cần!!</h4>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="card-footer bg-white d-flex justify-content-center">
+                <ul class="pagination">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index_SuKien", "Home", new { page = i, khoa = currentKhoa, loai = currentLoai, tuNgay = tuNgay, denNgay = denNgay })">@i</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
