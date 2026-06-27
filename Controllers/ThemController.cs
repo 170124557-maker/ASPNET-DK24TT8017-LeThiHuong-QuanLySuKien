@@ -18,7 +18,7 @@ namespace DA09_QLSK.Controllers
         [HttpGet]
         public IActionResult ThemSK()
         {
-            // 1. Tự sinh Mã sự kiện (Ví dụ: SK001, SK002...)
+            // 1. Tự sinh Mã sự kiện 
             var lastSK = _context.SuKien.OrderByDescending(s => s.MaSK).FirstOrDefault();
             string newId = lastSK != null ? "SK" + (int.Parse(lastSK.MaSK.Substring(2)) + 1).ToString("D3") : "SK001";
             ViewBag.NewMaSK = newId;
@@ -26,7 +26,7 @@ namespace DA09_QLSK.Controllers
             // 2. Tự sinh qr_code_token
             ViewBag.QRCodeToken = Guid.NewGuid().ToString();
 
-            // 3. Lấy dữ liệu loại sự kiện cho dropdown (Dùng tên cột 'TenLoai' theo ảnh DB của bạn)
+            // 3. Lấy dữ liệu loại sự kiện cho dropdown (Dùng tên cột 'TenLoai' theo ảnh DB)
             ViewBag.LoaiSKList = new SelectList(_context.PhanLoaiSK, "MaLoaiSK", "TenLoai");
 
             return View("~/Views/Admin/ThemSK.cshtml");

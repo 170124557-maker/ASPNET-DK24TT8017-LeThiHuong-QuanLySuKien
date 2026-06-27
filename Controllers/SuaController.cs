@@ -27,7 +27,7 @@ namespace DA09_QLSK.Controllers
             // Lấy toàn bộ danh sách Khoa để hiển thị dropdown
             ViewBag.KhoaList = _context.Khoa.ToList();
 
-            // Lấy Khoa hiện tại của sự kiện (Giả sử 1 sự kiện chỉ thuộc 1 khoa trong ngữ cảnh này)
+            // Lấy Khoa hiện tại của sự kiện 
             ViewBag.SelectedKhoa = _context.Khoa_SuKien
                 .FirstOrDefault(ks => ks.MaSK == id)?.MaKhoa;
 
@@ -51,11 +51,11 @@ namespace DA09_QLSK.Controllers
                 suKien.MotaSK = model.MotaSK;
                 suKien.start_date = model.start_date;
                 suKien.end_date = model.end_date;
-                suKien.Start_time = model.Start_time; // Cập nhật mới
-                suKien.End_time = model.End_time;     // Cập nhật mới
+                suKien.Start_time = model.Start_time; 
+                suKien.End_time = model.End_time;     
                 suKien.DiaDiem = model.DiaDiem;
                 suKien.TrangThai = model.TrangThai;
-                suKien.MaLoaiSK = model.MaLoaiSK;     // Cập nhật mới
+                suKien.MaLoaiSK = model.MaLoaiSK;    
                 suKien.max_participants = model.max_participants;
 
               

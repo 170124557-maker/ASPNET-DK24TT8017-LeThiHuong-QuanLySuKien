@@ -27,53 +27,12 @@ namespace DA09_QLSK.Controllers
 
 
         [HttpGet]
-        /*  public IActionResult ChiTietPhanCong(string id)
-          {
-              var suKien = _context.SuKien.Find(id);
-              if (suKien == null) return NotFound();
-
-              // Join để lấy dữ liệu kết hợp: PhanCong + TenSV từ SinhVien
-              var list = _context.PhanCong
-                  .Where(pc => pc.MaSK == id)
-                  .Join(_context.SinhVien,
-                        pc => pc.Account_id,
-                        sv => sv.Account_id,
-                        (pc, sv) => new { PhanCong = pc, TenSV = sv.TenSV })
-                  .ToList();
-
-                          // Danh sách chọn sinh viên đã đăng ký sự kiện
-              var dsDangKy = _context.DangKy.Where(d => d.MaSK == id).Select(d => d.MaSV).ToList();
-              ViewBag.SinhVienList = new SelectList(_context.SinhVien.Where(s => dsDangKy.Contains(s.MaSV)), "Account_id", "TenSV");
-
-              ViewBag.SuKien = suKien;
-              return View("~/Views/Admin/Admin_ChiTietPC.cshtml", list);
-          } */
-
-        /*  public IActionResult ChiTietPhanCong(string id)
-          {
-              // Lấy danh sách phân công mà không nạp kèm SinhVien (để tránh lỗi văng Exception)
-              var list = _context.PhanCong.Where(p => p.MaSK == id).ToList();
-
-              ViewBag.SuKien = _context.SuKien.Find(id);
-              return View("~/Views/Admin/Admin_ChiTietPC.cshtml", list);
-          }
-
-          [HttpPost]
-              public IActionResult LuuPhanCong(PhanCong model)
-              {
-                  model.ThoiGianPhanCong = DateTime.Now;
-                  _context.PhanCong.Add(model);
-                  _context.SaveChanges();
-                  return RedirectToAction("ChiTietPhanCong", new { id = model.MaSK });
-              }
-
-      }*/
-        public IActionResult ChiTietPhanCong(string id)
+         public IActionResult ChiTietPhanCong(string id)
         {
             var suKien = _context.SuKien.Find(id);
             if (suKien == null) return NotFound();
 
-            // 1. Lấy danh sách tài khoản đã đăng ký sự kiện đó (ví dụ từ bảng DangKy)
+            // 1. Lấy danh sách tài khoản đã đăng ký sự kiện 
             var dsDaDangKy = _context.DangKy
                 .Where(d => d.MaSK == id)
                 .Select(d => d.MaSV) // Dùng Account_id để khớp với SinhVien

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" />
 
     <style>
-        /* [Giữ nguyên CSS của bạn tại đây] */
+       
         html, body {
             height: 100%;
             margin: 0;
@@ -125,6 +125,8 @@
                 </a>
 
                 <div class="form-inline">
+
+                    @* KIỂM TRA ĐĂNG NHẬP  *@
                     @using Microsoft.AspNetCore.Http
                     @inject IHttpContextAccessor HttpContextAccessor
 
@@ -140,7 +142,7 @@
                     else
                     {
                         <a asp-controller="DangNhap" asp-action="DangNhap" class="btn btn-custom-auth" style="padding: 4px 10px !important;">Đăng Nhập</a>
-                      //  <a asp-controller="DangKy" asp-action="DangKy" class="btn btn-custom-auth" style="padding: 4px 10px !important;">Đăng Ký</a>
+                        //  <a asp-controller="DangKy" asp-action="DangKy" class="btn btn-custom-auth" style="padding: 4px 10px !important;">Đăng Ký</a>
                     }
                 </div>
             </div>
@@ -154,7 +156,7 @@
                             <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        @* --- CODE KIỂM TRA ROLE (BẮT ĐẦU) --- *@
+                        @* --- CODE KIỂM TRA ROLE để hiển thị menu item --- *@
                         @{
                             var role = HttpContextAccessor.HttpContext.Session.GetString("Role");
                         }
@@ -170,8 +172,7 @@
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item py-2" asp-controller="QuanLySK" asp-action="QuanLySK">Danh sách</a>
                                     <a class="dropdown-item py-2" asp-controller="Them" asp-action="ThemSK">Thêm mới</a>
-                                    @*  <a class="dropdown-item py-2" asp-controller="DiemDanh" asp-action="DiemDanh">Điểm Danh</a>
-                    <a class="dropdown-item py-2" href="#">Báo Cáo & Thống Kê</a> *@
+                                  
                                 </div>
 
                             </li>
@@ -184,7 +185,7 @@
                                 <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-controller="PhanCong" asp-action="Admin_PhanCong">Phân công</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-controller="ThongKe_Report" asp-action="ThongKe">Thống kê</a>
+                                <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-controller="ThongKe_Report" asp-action="ThongKe">Thống kê-Báo cáo</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" href="/ThongBao/Index">Thông báo</a>
@@ -205,13 +206,11 @@
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-area="" asp-controller="ThongKe_Report" asp-action="ThongKe">Thống kê-Báo cáo</a>
+                                <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-area="" asp-controller="ThongKe_Report" asp-action="ThongKe">Thống kê</a>
                             </li>
                             @if (!string.IsNullOrEmpty(hoTen))
                             {
-                                // <li class="class="nav-item ml-3">
-                                //      <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" href="@Url.Action("Index", "myNoti")">Thông báo của tôi</a>
-                                //  </li>
+                               
                                 <li class="nav-item ml-3">
                                     <a class="nav-link text-white font-weight-bold" style="font-size: 13px;" asp-controller="MySK" asp-action="MySK">Sự kiện của tôi</a>
                                 </li>

@@ -80,13 +80,24 @@ namespace DA09_QLSK.Controllers
             ViewBag.SelectedKhoa = khoa;
             ViewBag.SelectedTrangThai = trangThai;
             ViewBag.SelectedLoaiSK = loaiSK;     // Lưu lại giá trị đã chọn để dropdown giữ nguyên trạng thái
+            ViewBag.TotalItems = totalItems; // lưu giá trị Tổng số sự kiện
+
+            // Lưu giá trị vẽ biểu đồ tròn:
+
+            ViewBag.ChartData = _context.Khoa.Select(k => new {
+
+                TenKhoa = k.TenKhoa,
+
+                SoLuong = _context.Khoa_SuKien.Count(ks => ks.MaKhoa == k.MaKhoa)
+
+            }).ToList();
 
             return View("~/Views/Admin/ThongKe_Report.cshtml", pagedList);
         }
 
 
 
-        // Action mẫu cho nút Export (Bạn có thể bổ sung logic xuất file sau)
+        // Action cho nút Export
         public IActionResult ExportExcel(string khoa, string trangThai, string loaiSK)
         {
             // 1. Lấy dữ liệu giống như khi hiển thị bảng (lấy tất cả, không phân trang)

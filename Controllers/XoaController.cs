@@ -28,20 +28,18 @@ namespace DA09_QLSK.Controllers
 
             try
             {
-                // 2. Chỉ cập nhật trạng thái thành "Đã xóa"
-                // Việc này giúp giữ lại dữ liệu trong bảng SuKien và 
-                // không gây ảnh hưởng đến bảng trung gian Khoa_SuKien
-                suKien.TrangThai = "Đã xóa";
+                // 2. Xóa trực tiếp bản ghi khỏi database
+                _context.SuKien.Remove(suKien);
 
                 // 3. Lưu thay đổi vào database
                 _context.SaveChanges();
 
                 // Trả về kết quả thành công cho Ajax
-                return Json(new { success = true });
+                return Json(new { success = true, message = "Đã xóa sự kiện thành công!" });
             }
             catch (System.Exception ex)
             {
-                // Nếu có lỗi hệ thống (ví dụ: database disconnect), trả về thông báo lỗi
+                // Nếu có lỗi hệ thống (ví dụ: lỗi khóa ngoại hoặc database disconnect)
                 return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
             }
         }

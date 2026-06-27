@@ -32,8 +32,7 @@ namespace DA09_QLSK.Controllers
                                   select sk).ToList();
 
             // Chỉ cần return View(data) - Hệ thống sẽ tự tìm trong Views/MySK/MySK.cshtml
-            // Nếu bạn để trong Views/SuKien/, hãy dùng: return View("~/Views/SuKien/MySK.cshtml", danhSachSuKien);
-            return View("~/Views/SuKien/MySK.cshtml", danhSachSuKien);
+                      return View("~/Views/SuKien/MySK.cshtml", danhSachSuKien);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -64,7 +64,7 @@ public class DiemDanhController : Controller
     }
 }
 
-*/
+/*
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -146,4 +146,4 @@ public class DiemDanhController : Controller
 
         return Content("Bạn chưa đăng ký sự kiện này nên không thể điểm danh!");
     }
-}
+} */

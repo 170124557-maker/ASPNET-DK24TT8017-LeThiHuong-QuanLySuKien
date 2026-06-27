@@ -73,7 +73,7 @@ namespace DA09_QLSK.Controllers
         }
 
         // ============================================================
-        // TÌM KIẾM CHUNG (GIỮ NGUYÊN LOGIC CỦA BẠN)
+        // TÌM KIẾM CHUNG 
         // ============================================================
         public IActionResult TimKiemChung(string tuKhoa)
         {
@@ -114,7 +114,7 @@ namespace DA09_QLSK.Controllers
 
         public IActionResult TatCaSuKien()
         {
-            // Logic TatCaSuKien của bạn đã được tối ưu trong TimKiemChung hoặc để nguyên ở đây
+            // Logic TatCaSuKien đã được tối ưu trong TimKiemChung 
             return RedirectToAction("TimKiemChung", new { tuKhoa = "" });
         }
 
@@ -135,10 +135,10 @@ namespace DA09_QLSK.Controllers
                 return NotFound("Không tìm thấy sự kiện này.");
             }
             // Lấy thông tin sự kiện
-                    // Bạn cần thay 'Khoa' bằng tên bảng thật chứa Tên Khoa của bạn
+                  
             var tenKhoa = _context.Khoa_SuKien
                 .Where(ks => ks.MaSK == id)
-                .Join(_context.Khoa, // Thay '_context.Khoa' bằng đúng tên bảng Khoa của bạn
+                .Join(_context.Khoa, //
                       ks => ks.MaKhoa,
                       k => k.MaKhoa,
                       (ks, k) => k.TenKhoa)
